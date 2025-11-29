@@ -1,0 +1,186 @@
+---
+title: "Quantium Virtual Internship- Retail Strategy and  Analytics- Task 1"
+output: word_document
+date: "2025-11-28"
+---
+```{r}
+#### Load required libraries 
+library(data.table)
+library(ggplot2)
+library(readr)
+```
+
+```{r}
+#### Load the Dataset
+transactionData = read.csv("QVI_transaction_data.csv")
+customerData = read.csv("QVI_purchase_behaviour.csv")
+```
+
+```{r}
+#### Examine transaction data
+str(transactionData)
+```
+```{r}
+#### Convert DATE column to a date format
+transactionData<-as.data.table(transactionData)
+transactionData[,DATA:=as.Date(DATE,origin="1899-12-30")]
+```
+
+```{r}
+#### Examine PROD_NAME
+transactionData[, .N, PROD_NAME]
+```
+```{r}
+ productWords<- data.table(unlist(strsplit(unique(transactionData[,
+ PROD_NAME]), " ")))
+ setnames(productWords, 'words')
+```
+
+```{r}
+ productWords <- productWords[grepl("\\d", words) == FALSE, ]
+ productWords <- productWords[grepl("[:alpha:]", words), ]
+ productWords[, .N, words][order(N, decreasing = TRUE)]
+```
+```{r}
+ summary(transactionData)
+```
+```{r}
+ transactionData[PROD_QTY == 200, ]
+```
+```{r}
+ transactionData[LYLTY_CARD_NBR == 226000, ]
+```
+```{r}
+ transactionData <- transactionData[LYLTY_CARD_NBR != 226000, ]
+ summary(transactionData)
+```
+```{r}
+ transactionData[, .N, by = DATE]
+```
+
+
+```{r}
+ transactionData[,PACK_SIZE:= parse_number(PROD_NAME)]
+ transactionData[,.N,PACK_SIZE][order(PACK_SIZE)]
+```
+```{r}
+ transactionData
+```
+```{r}
+ hist(transactionData[,PACK_SIZE])
+```
+```{r}
+ transactionData[,BRAND:= toupper(substr(PROD_NAME,1, regexpr(pattern='',
+ PROD_NAME)-1))] 
+ transactionData[,.N,by=BRAND][order(-N)]
+```
+```{r}
+ transactionData[BRAND == "RED", BRAND := "RRD"]
+ transactionData[BRAND == "SNBTS", BRAND := "SUNBITES"]
+ transactionData[BRAND == "INFZNS", BRAND := "INFUZIONS"]
+ transactionData[BRAND == "WW", BRAND := "WOOLWORTHS"]
+ transactionData[BRAND == "SMITH", BRAND := "SMITHS"]
+ transactionData[BRAND == "NCC", BRAND := "NATURAL"]
+ transactionData[BRAND == "DORITO", BRAND := "DORITOS"]
+ transactionData[BRAND == "GRAIN", BRAND := "GRNWVES"]
+```
+
+```{r}
+ transactionData[, .N, by = BRAND][order(BRAND)]
+```
+```{r}
+ str(customerData)
+```
+```{r}
+ summary(customerData)
+```
+```{r}
+customerData<-as.data.table(customerData)
+customerData[,.N, by = LIFESTAGE][order(-N)]
+```
+```{r}
+customerData[, .N, by = PREMIUM_CUSTOMER][order(-N)]
+```
+```{r}
+ data <- merge(transactionData, customerData, all.x = TRUE)
+```
+
+```{r}
+data[is.null(LIFESTAGE), .N]
+```
+```{r}
+ data[is.null(PREMIUM_CUSTOMER), .N]
+```
+```{r}
+fwrite(data,"QVI_data.csv")
+```
+
+```{r}
+ customers<-data[,.(CUSTOMERS= uniqueN(LYLTY_CARD_NBR)),.(LIFESTAGE,
+ PREMIUM_CUSTOMER)][order(-CUSTOMERS)]
+```
+
+```{r}
+ avg_units<-data[,.(AVG= sum(PROD_QTY)/uniqueN(LYLTY_CARD_NBR)),
+ .(LIFESTAGE,PREMIUM_CUSTOMER)][order(-AVG)] 
+ ggplot(data=avg_units, aes(weight=AVG,x= LIFESTAGE,fill=
+ PREMIUM_CUSTOMER))+ 
+ geom_bar(position= position_dodge()) +
+ labs(x= "Lifestage",y= "Avgunitspertransaction",title="Unitsper
+ customer") + 
+ theme(axis.text.x= element_text(angle=90,vjust=0.5))
+```
+```{r}
+ avg_price <- data[, .(AVG = sum(TOT_SALES)/sum(PROD_QTY)), .(LIFESTAGE,
+ PREMIUM_CUSTOMER)][order(-AVG)]
+
+ ggplot(data = avg_price, aes(weight = AVG, x = LIFESTAGE, fill =
+ PREMIUM_CUSTOMER)) +
+ geom_bar(position = position_dodge()) +
+ labs(x = "Lifestage", y = "Avg price per unit", title = "Price per unit") +
+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+```{r}
+ pricePerUnit <- data[, price := TOT_SALES/PROD_QTY]
+ t.test(data[LIFESTAGE %in% c("YOUNG SINGLES/COUPLES", "MIDAGE SINGLES/COUPLES")
+ & PREMIUM_CUSTOMER == "Mainstream", price]
+
+ , data[LIFESTAGE %in% c("YOUNG SINGLES/COUPLES", "MIDAGE SINGLES/COUPLES")
+ & PREMIUM_CUSTOMER != "Mainstream", price]
+ , alternative = "greater")
+```
+```{r}
+ segment1 <- data[LIFESTAGE == "YOUNG SINGLES/COUPLES" & PREMIUM_CUSTOMER ==
+ "Mainstream",]
+ other <- data[!(LIFESTAGE == "YOUNG SINGLES/COUPLES" & PREMIUM_CUSTOMER ==
+ "Mainstream"),]
+ quantity_segment1 <- segment1[, sum(PROD_QTY)]
+```
+
+```{r}
+quantity_other <- other[, sum(PROD_QTY)]
+ quantity_segment1_by_brand <- segment1[, .(targetSegment =
+ sum(PROD_QTY)/quantity_segment1), by = BRAND]
+ 
+ quantity_other_by_brand <- other[, .(other = sum(PROD_QTY)/quantity_other), by
+ = BRAND]
+ brand_proportions <- merge(quantity_segment1_by_brand,
+ quantity_other_by_brand)[, affinityToBrand := targetSegment/other]
+
+ brand_proportions[order(-affinityToBrand)]
+```
+```{r}
+ quantity_segment1_by_pack <- segment1[, .(targetSegment =
+ sum(PROD_QTY)/quantity_segment1), by = PACK_SIZE]
+
+ quantity_other_by_pack <- other[, .(other = sum(PROD_QTY)/quantity_other), by =
+ PACK_SIZE]
+ pack_proportions <- merge(quantity_segment1_by_pack, quantity_other_by_pack)[,
+ affinityToPack := targetSegment/other]
+
+ pack_proportions[order(-affinityToPack)]
+```
+```{r}
+ data[PACK_SIZE == 270, unique(PROD_NAME)]
+```
+
