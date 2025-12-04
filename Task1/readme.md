@@ -1,4 +1,3 @@
-{"id":"54021","variant":"standard","title":"Quantium Virtual Internship – Task 1 README"}
 # Quantium Virtual Internship – Retail Strategy & Analytics (Task 1)
 
 ## 📌 Project Overview
