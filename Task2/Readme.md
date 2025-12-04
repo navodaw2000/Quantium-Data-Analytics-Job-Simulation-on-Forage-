@@ -56,10 +56,5 @@ The main R script (`task2_analysis.R`) includes:
 - Control store selection
 - Visualization of results
 
----
 
-## How to Run
-1. Install required R packages (if not already installed):
-```r
-install.packages(c("data.table", "ggplot2", "lubridate"))
 
