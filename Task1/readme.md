@@ -124,15 +124,3 @@ These insights will support customer segmentation and strategic recommendations 
 
 **Chalani Navoda**  
 
----
-
-## ⭐ How to Use
-
-1. Clone this repository
-2. Place the dataset CSV files in the project directory
-3. Run the R script in RStudio
-4. View summaries and outputs in the console & plots
-
----
-
-If you find this project useful, feel free to ⭐ the repository!
