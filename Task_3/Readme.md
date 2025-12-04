@@ -1,26 +1,5 @@
 # Inside Sherpa – Chips Category Review
 
-**Classification:** Private  
-**Prepared by:** Quantium  
-**Document Type:** Trial Store Analysis & Insights  
-
----
-
-## Table of Contents
-1. [Executive Summary](#executive-summary)  
-2. [Privacy & Security](#privacy--security)  
-3. [Ethical Use of Data](#ethical-use-of-data)  
-4. [Chips Category Overview](#chips-category-overview)  
-5. [Customer Insights](#customer-insights)  
-6. [Weekly Transactions Over Time](#weekly-transactions-over-time)  
-7. [Customer Distribution](#customer-distribution)  
-8. [Trial & Control Store Performance](#trial--control-store-performance)  
-9. [Number of Customers Over Time](#number-of-customers-over-time)  
-10. [Key Insights & Recommendations](#key-insights--recommendations)  
-11. [Disclaimer](#disclaimer)  
-
----
-
 ## Executive Summary
 - 17-year history assures best practice in **privacy, security, and ethical use of data**.  
 - Privacy by design and de-identified data ensures security of personal information.  
